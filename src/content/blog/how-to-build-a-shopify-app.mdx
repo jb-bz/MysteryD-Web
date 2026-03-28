@@ -1,0 +1,228 @@
+# How to Build a Shopify App: A Developer's Guide
+
+*Draft v1.0 — Ready for MDX implementation once blog is live*
+*Author: CMO*
+*Target: 2,000-3,000 words*
+
+---
+
+## SEO Metadata
+
+**Title tag:** How to Build a Shopify App | Developer Guide (2026)
+**Meta description:** Learn how to build a Shopify app from scratch. Step-by-step tutorial covering Shopify Dev Store setup, API authentication, and deploying your first custom app.
+**Primary keyword:** how to build a Shopify app
+**Secondary keywords:** Shopify app development tutorial, build custom Shopify app, Shopify API getting started
+**URL slug:** /blog/how-to-build-a-shopify-app
+
+---
+
+## Introduction
+
+Shopify powers over 4 million stores. Most of those stores are running on apps from the Shopify App Store — but plenty of them are running poorly, slowly, or in ways that create more problems than they solve.
+
+If you have a Shopify store and need something the App Store does not offer, you have two choices: find a workaround or build it yourself.
+
+This guide walks through how to build a Shopify app from scratch. We cover the Dev Store setup, the API basics, authentication, and the minimum viable structure to ship something real.
+
+No fluff. No "install our template and call it done." Just the actual steps.
+
+---
+
+## Prerequisites
+
+Before you start, you need:
+
+- A **Shopify Partner account** (free)
+- A **Dev Store** (free development store for testing)
+- Basic familiarity with REST APIs
+- A backend to host your app (or Shopify's CLI with ngrok for local dev)
+
+---
+
+## Step 1: Set Up Your Dev Store
+
+1. Go to [Shopify Partner Dashboard](https://partners.shopify.com)
+2. Create a new Partner account or log in
+3. Navigate to **Apps** → **Create App**
+4. Select "Test your app's experience in a development store"
+5. Create or select your Dev Store
+
+Your Dev Store is a real Shopify instance you control. You can install your own app here and test every feature without affecting a live store.
+
+---
+
+## Step 2: Understand the App Types
+
+Shopify apps come in two flavors:
+
+### Custom Apps
+Built for a single store. Good for one-off projects, internal tools, or store-specific integrations. Cannot be listed on the Shopify App Store.
+
+### Partner Apps
+Built through the Partner Dashboard. Can be distributed to multiple stores — either publicly on the App Store or privately to specific merchants.
+
+For most developers building something they want to sell or distribute, a **Partner App** is the right starting point.
+
+---
+
+## Step 3: Authenticate with Shopify API
+
+Shopify uses OAuth 2.0 for app authentication. The flow:
+
+1. Merchant clicks "Install" on your app
+2. Shopify redirects to your app's install URL with a `code` parameter
+3. Your app exchanges the `code` for an access token
+4. You use that token to make API calls on behalf of the merchant
+
+```
+POST /admin/oauth/access_token
+{
+  "client_id": "YOUR_API_KEY",
+  "client_secret": "YOUR_API_SECRET",
+  "code": "received_code"
+}
+```
+
+Response:
+```
+{
+  "access_token": "shpat_xxxxx",
+  "scope": "read_products,write_products"
+}
+```
+
+Store this token securely. It does not expire unless the merchant uninstalls your app.
+
+---
+
+## Step 4: Choose Your API
+
+### REST Admin API
+The older, well-documented option. Structured around resources (products, orders, customers). Still widely used.
+
+### GraphQL Admin API
+The newer option. More flexible queries, better performance for complex data needs. Recommended for new projects.
+
+For this guide, we assume REST, but the principles transfer.
+
+---
+
+## Step 5: Build Something Real
+
+Here is a minimal Node.js/Express example that:
+
+1. Handles the OAuth install flow
+2. Creates a webhook when a product is created
+3. Logs the product data
+
+```javascript
+const express = require("express");
+const crypto = require("crypto");
+
+const app = express();
+
+// OAuth callback
+app.get("/shopify/install", async (req, res) => {
+  const { code, shop } = req.query;
+ 
+  const tokenResponse = await fetch(`https://${shop}/admin/oauth/access_token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      client_id: process.env.SHOPIFY_API_KEY,
+      client_secret: process.env.SHOPIFY_API_SECRET,
+      code
+    })
+  });
+ 
+  const { access_token } = await tokenResponse.json();
+ 
+  // Store access_token for this shop
+  // Then redirect to your app dashboard
+  res.redirect("/dashboard");
+});
+
+// Webhook handler
+app.post("/webhooks/products/create", express.raw({ type: "application/json" }), (req, res) => {
+  const hmac = req.get("X-Shopify-Hmac-Sha256");
+  const body = req.body;
+ 
+  const generatedHash = crypto
+    .createHmac("sha256", process.env.SHOPIFY_API_SECRET)
+    .update(body)
+    .digest("base64");
+ 
+  if (hmac !== generatedHash) {
+    return res.status(401).send("Unauthorized");
+  }
+ 
+  const product = JSON.parse(body);
+  console.log("New product created:", product.title);
+ 
+  res.status(200).send("OK");
+});
+
+app.listen(3000, () => console.log("App running on port 3000"));
+```
+
+---
+
+## Step 6: Test Everything
+
+Use Shopify's CLI to tunnel your local app:
+
+```bash
+npm install -g @shopify/cli
+shopify app tunnel --host=ngrok
+```
+
+This gives you a public URL to use as your app's callback URL in the Partner Dashboard.
+
+Test the full flow:
+1. Install the app on your Dev Store
+2. Create a product manually
+3. Verify the webhook fires and logs correctly
+
+---
+
+## When to Build Custom vs. Use Off-the-Shelf
+
+Building a Shopify app is not trivial. Before you start, ask:
+
+| Question | If Yes | If No |
+|----------|--------|-------|
+| Does this exist in the App Store? | Check reviews and alternatives | Proceed with build |
+| Is it a one-off internal need? | Custom app makes sense | Consider App Store listing |
+| Do you have backend infrastructure? | You are ready | Consider Shopify CLI + ngrok for simpler setups |
+| Will others need this? | Build for distribution | Custom app is fine |
+
+---
+
+## How MysteryD Can Help
+
+If you are a merchant who needs something the App Store does not offer, MysteryD builds custom Shopify apps — focused, transparent, done right.
+
+If you are a developer who wants a partner for complex builds, we work with Shopify's API daily and can handle the technical heavy lifting.
+
+[Join our mailing list](/waitlist) to get notified when we launch new apps or publish technical guides.
+
+---
+
+## Summary
+
+Building a Shopify app requires:
+
+1. Shopify Partner account + Dev Store
+2. OAuth implementation for merchant authentication
+3. API integration (REST or GraphQL)
+4. Webhook handlers for event-driven flows
+5. Proper HMAC validation for security
+6. Testing on a real Dev Store
+
+It is achievable in a weekend for simpler apps. Complex integrations take longer — but that is true of any system worth building correctly.
+
+Questions? [Open an issue on GitHub](https://github.com/mysteryd) or [join our Discord](https://discord.gg/mysteryd).
+
+---
+
+*Next in this series: "Shopify API Integration Best Practices" — covering rate limits, retry logic, and webhook reliability.*

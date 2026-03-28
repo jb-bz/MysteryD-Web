@@ -1,0 +1,274 @@
+# Shopify API Integration Best Practices: A Developer's Guide
+
+*Draft v1.0 — Ready for MDX implementation once blog is live*
+*Author: CMO*
+*Target: 2,000-2,500 words*
+
+---
+
+## SEO Metadata
+
+**Title tag:** Shopify API Integration Best Practices | Developer Guide (2026)
+**Meta description:** Master Shopify API integration with these best practices. Learn about rate limits, webhook reliability, retry logic, and how to build stable Shopify apps that scale.
+**Primary keyword:** Shopify API integration best practices
+**Secondary keywords:** Shopify API rate limits, webhook reliability, Shopify app development
+**URL slug:** /blog/shopify-api-integration-best-practices
+
+---
+
+## Introduction
+
+The Shopify API is well-documented and reasonably stable — but that does not mean integrating with it is straightforward. Rate limits catch developers off guard. Webhooks fail silently. Retry logic, if implemented incorrectly, creates duplicate records. The gap between "works in testing" and "works in production at scale" is wider than most developers expect.
+
+This guide covers the integration patterns that matter: rate limit handling, webhook reliability, idempotency, and error handling. If you are building on Shopify, this is the stuff you need to get right.
+
+---
+
+## Rate Limits: The First Thing You Will Hit Wrong
+
+Shopify enforces rate limits on all API calls. The limits vary by endpoint and by plan, but the concept is the same: you get a finite number of requests per second or per minute, and exceeding that returns a 429 Too Many Requests response.
+
+### Understanding the Limits
+
+Shopify uses a bucket system:
+- **REST Admin API:** 40 requests/second for unbounded API calls, lower for specific endpoints
+- **GraphQL Admin API:** 50 points/second by default, with different mutations consuming different point values
+
+The response headers tell you exactly where you stand:
+
+```
+X-Shopify-Shop-Api-Call-Limit: 39/40
+```
+
+When you see 38/40 or higher, you are approaching the limit. Back off.
+
+### Handling 429s Correctly
+
+The worst thing you can do is retry immediately. When you get a 429, wait and retry — but not with a fixed delay. Use exponential backoff with jitter:
+
+```javascript
+async function shopifyRequestWithRetry(fetchFn, maxRetries = 3) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const response = await fetchFn();
+    
+    if (response.status === 429) {
+      const retryAfter = response.headers.get('Retry-After') || 1;
+      const jitter = Math.random() * 1000;
+      const delay = (parseInt(retryAfter) * 1000) + jitter;
+      
+      await new Promise(resolve => setTimeout(resolve, delay));
+      continue;
+    }
+    
+    return response;
+  }
+  
+  throw new Error('Max retries exceeded for Shopify API call');
+}
+```
+
+### Batching with GraphQL
+
+When you need to fetch or modify multiple resources, GraphQL's ability to batch queries is more efficient than multiple REST calls. A single query that fetches 10 products costs less against your rate limit than 10 separate GET requests.
+
+---
+
+## Webhooks: Getting Them Right
+
+Webhooks are how Shopify tells your app that something happened. A customer placed an order. A product was updated. A fulfillment was created. Your app needs to respond to these events reliably.
+
+### The Webhook Registration Problem
+
+When you register a webhook, Shopify sends a test to confirm the endpoint is reachable. This test fires immediately on registration — not when you expect it. If your app is not yet listening, the webhook registration appears to fail.
+
+Always register webhooks after your app is fully initialized, not at startup.
+
+### Verifying Webhook Signatures
+
+Every webhook from Shopify includes an HMAC signature in the `X-Shopify-Hmac-Sha256` header. You must verify this before processing the payload:
+
+```javascript
+const crypto = require('crypto');
+
+function verifyShopifyWebhook(rawBody, secret, hmac) {
+  const generatedHash = crypto
+    .createHmac('sha256', secret)
+    .update(rawBody)
+    .digest('base64');
+  
+  return hmac === generatedHash;
+}
+
+// In your Express handler
+app.post('/webhooks/orders/create', express.raw({ type: 'application/json' }), (req, res) => {
+  const hmac = req.get('X-Shopify-Hmac-Sha256');
+  
+  if (!verifyShopifyWebhook(req.body, process.env.SHOPIFY_WEBHOOK_SECRET, hmac)) {
+    return res.status(401).send('Invalid signature');
+  }
+  
+  // Process the webhook
+  const order = JSON.parse(req.body);
+  console.log('Order received:', order.id);
+  
+  res.status(200).send('OK');
+});
+```
+
+**Critical:** Use `express.raw()` for the webhook route, not `express.json()`. Shopify sends the body as raw bytes, and `express.json()` will have already parsed it by the time you need to verify the signature.
+
+### Responding Fast, Processing Later
+
+Your webhook handler must respond with a 200 status within 5 seconds, or Shopify considers it a failure and retries. If you need to do heavy processing — database writes, external API calls, multiple operations — queue the work and respond immediately:
+
+```javascript
+app.post('/webhooks/orders/create', express.raw({ type: 'application/json' }), async (req, res) => {
+  // Respond immediately
+  res.status(200).send('OK');
+  
+  // Process in background
+  const order = JSON.parse(req.body);
+  await orderQueue.add('process-order', { orderId: order.id, ...order });
+});
+```
+
+Use a job queue like Bull, BullMQ, or a simple in-memory queue for lower-traffic apps. The key is responding fast and processing async.
+
+### Webhook Failure Handlers
+
+Shopify retries failed webhooks with exponential backoff over 48 hours. If your endpoint is down for maintenance, Shopify will eventually give up and mark it as failed — but you will not know unless you monitor your webhook logs.
+
+Set up alerts for webhook failures. Check the `X-Shopify-Triggered-By` header to identify which webhook handler is failing and why.
+
+---
+
+## Idempotency: Preventing Duplicate Operations
+
+Any API call that creates or modifies data should be idempotent — calling it multiple times with the same inputs should produce the same result, not duplicate records.
+
+### Why This Matters for Shopify Apps
+
+Imagine your webhook handler creates a fulfillment record when an order is paid. If Shopify retries the webhook because your first response timed out, you could create two fulfillment records.
+
+Use a unique identifier from Shopify as your idempotency key:
+
+```javascript
+async function processOrder(orderId, shopifyOrderId) {
+  // Check if already processed
+  const existing = await db.fulfillments.findOne({ 
+    shopifyOrderId,
+    status: 'completed'
+  });
+  
+  if (existing) {
+    console.log('Order already processed, skipping');
+    return;
+  }
+  
+  // Process the order
+  await db.fulfillments.create({ 
+    shopifyOrderId,
+    orderId,
+    status: 'completed'
+  });
+}
+```
+
+For REST API calls that create resources, use the `Idempotency-Key` header. Shopify will return the same response for duplicate keys within a 24-hour window.
+
+---
+
+## Error Handling Patterns
+
+Shopify API errors follow a consistent structure:
+
+```json
+{
+  "errors": {
+    "title": ["can't be blank"],
+    "variant": ["Required parameter missing"]
+  }
+}
+```
+
+Your error handling should:
+
+1. **Parse the error structure** — the errors object contains field-specific messages
+2. **Distinguish between 4xx and 5xx errors** — 4xx are client errors (bad data, missing permissions), 5xx are Shopify's problem
+3. **Do not surface raw API errors to users** — translate them into user-friendly messages
+
+```javascript
+function parseShopifyError(response) {
+  if (response.status >= 500) {
+    return 'Shopify is experiencing issues. Please try again shortly.';
+  }
+  
+  if (response.status === 401) {
+    return 'Authentication failed. Please reconnect your Shopify store.';
+  }
+  
+  if (response.status === 403) {
+    return 'Access denied. Your Shopify store may not have the required permissions.';
+  }
+  
+  if (response.status === 404) {
+    return 'Resource not found.';
+  }
+  
+  // Parse field-level errors
+  const data = response.json();
+  if (data.errors) {
+    const messages = Object.entries(data.errors)
+      .map(([field, errors]) => `${field}: ${errors.join(', ')}`)
+      .join('; ');
+    return messages;
+  }
+  
+  return 'An unexpected error occurred.';
+}
+```
+
+---
+
+## Testing Your Integration
+
+The hardest part of Shopify development is testing. You cannot easily simulate rate limits, webhook failures, or network partitions in a development environment.
+
+### Use Shopify's Test Orders
+
+Enable test orders in your Dev Store settings. These orders go through the full order lifecycle without charging real money. Use them to trigger webhooks and test your handlers.
+
+### Chaos Engineering for Webhooks
+
+Periodically fail your webhook handler and verify:
+1. The retry logic works correctly
+2. Duplicate webhooks do not create duplicate records (idempotency)
+3. Your monitoring/alerting fires appropriately
+
+### Local Tunneling
+
+Use `shopify app tunnel` to expose your local app to the internet for webhook testing. Without a public URL, Shopify cannot deliver webhooks to your local machine.
+
+---
+
+## Summary: The Checklist
+
+Before you ship a Shopify integration:
+
+- [ ] Rate limit handling with exponential backoff is implemented
+- [ ] 429 responses are caught and retried correctly
+- [ ] Webhook signatures are verified on every request
+- [ ] Webhook handlers respond within 5 seconds (async processing)
+- [ ] Duplicate webhooks do not create duplicate records (idempotency)
+- [ ] Field-level API errors are parsed and translated to user messages
+- [ ] 5xx errors from Shopify are logged and retried
+- [ ] Webhook failure monitoring is in place
+- [ ] Test orders trigger the full integration flow
+
+The patterns in this guide are not optional. They are what separate apps that work in demo from apps that work in production.
+
+---
+
+*Questions about Shopify development? [Open an issue on GitHub](https://github.com/mysteryd) or [join our Discord](https://discord.gg/mysteryd).*
+
+*This is the second article in our Shopify developer series. First was "How to Build a Shopify App."*
