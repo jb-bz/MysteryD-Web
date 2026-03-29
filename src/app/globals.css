@@ -61,7 +61,7 @@
   --secondary-foreground: #1E1B2E;
   --muted: #C4B5FD;
   --muted-foreground: #4C4469;
-  --accent: #7C3AED;
+  --accent: #1E1B2E;
   --accent-foreground: #FFFFFF;
   --destructive: #EF4444;
   --border: #DDD6FE;
@@ -72,7 +72,7 @@
   --chart-3: #C4B5FD;
   --chart-4: #DDD6FE;
   --chart-5: #EDE9FE;
-  --radius: 0.625rem;
+  --radius: 0.5rem;
   --sidebar: #FFFFFF;
   --sidebar-foreground: #1E1B2E;
   --sidebar-primary: #7C3AED;
@@ -96,7 +96,7 @@
   --secondary-foreground: #EDE9FE;
   --muted: #3D2F6B;
   --muted-foreground: #A89BC2;
-  --accent: #9D5FF3;
+  --accent: #F5F3FF;
   --accent-foreground: #0F0A1E;
   --destructive: #F87171;
   --border: #3D2F6B;
@@ -125,9 +125,157 @@
     @apply bg-background text-foreground;
   }
   html {
-    @apply font-sans;
+    @apply font-sans scroll-smooth;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
   }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes noise {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-1%, -1%); }
+  20% { transform: translate(1%, 1%); }
+  30% { transform: translate(-1%, 1%); }
+  40% { transform: translate(1%, -1%); }
+  50% { transform: translate(-1%, 0); }
+  60% { transform: translate(1%, 0); }
+  70% { transform: translate(0, -1%); }
+  80% { transform: translate(0, 1%); }
+  90% { transform: translate(-1%, -1%); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.5s ease-out forwards;
+}
+
+.animate-slide-down {
+  animation: slide-down 0.3s ease-out forwards;
+}
+
+.animate-noise {
+  animation: noise 0.3s steps(2) infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+.stagger-1 { animation-delay: 100ms; }
+.stagger-2 { animation-delay: 200ms; }
+.stagger-3 { animation-delay: 300ms; }
+.stagger-4 { animation-delay: 400ms; }
+.stagger-5 { animation-delay: 500ms; }
+
+.noise-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.dark .noise-overlay::before {
+  opacity: 0.05;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--primary), var(--muted-foreground));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dark .text-gradient {
+  background: linear-gradient(135deg, var(--primary), var(--foreground));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.15);
+}
+
+.dark .hover-lift:hover {
+  box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.4);
+}
+
+.underline-animation {
+  position: relative;
+}
+
+.underline-animation::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+
+.underline-animation:hover::after {
+  width: 100%;
 }
