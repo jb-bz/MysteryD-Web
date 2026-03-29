@@ -1,5 +1,6 @@
 import { GithubIcon } from "@/components/icons";
-import { MailingListForm } from "@/components/mailing-list-form";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 const team = [
   {
@@ -22,45 +23,84 @@ const team = [
   },
 ];
 
+const principles = [
+  {
+    number: "01",
+    title: "Async-first",
+    description: "Small team. Ship fast, listen hard, improve constantly. No standups for the sake of standups.",
+  },
+  {
+    number: "02",
+    title: "Customer-led",
+    description: "What merchants tell us matters more than what we assume. Real feedback, real improvements.",
+  },
+  {
+    number: "03",
+    title: "One at a time",
+    description: "Scope locked before build begins. No feature creep. Every app does one thing well.",
+  },
+];
+
 export default function AboutPage() {
   return (
     <div className="flex flex-col">
-      <section className="relative py-24 md:py-40 px-6 bg-[#0F0A1E] dark:bg-[#0F0A1E] text-[#EDE9FE] overflow-hidden">
+      <section className="relative py-32 md:py-48 px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-foreground to-background" />
         <div className="absolute inset-0 noise-overlay" />
-        <div className="container mx-auto max-w-4xl relative z-10">
-          <span className="inline-block text-[#9D5FF3] text-sm font-mono tracking-widest uppercase mb-6 opacity-0 animate-fade-up">
-            About
-          </span>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[0.95] mb-8 opacity-0 animate-fade-up stagger-1">
-            We build what we wish existed.
-          </h1>
-          <p className="text-xl md:text-2xl text-[#A89BC2] max-w-2xl opacity-0 animate-fade-up stagger-2">
-            MysteryD was founded on a simple idea: the best software comes from solving real problems, not chasing feature lists.
-          </p>
+        
+        <div className="absolute top-1/4 right-0 w-96 h-96 gradient-blur bg-primary/10 translate-x-1/2" />
+        
+        <div className="container mx-auto max-w-5xl relative z-10">
+          <div className="max-w-3xl">
+            <span className="eyebrow mb-8 block animate-fade-up">About</span>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[0.95] mb-10 animate-fade-up stagger-1">
+              We build what we{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">
+                wish existed.
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl animate-fade-up stagger-2">
+              MysteryD was founded on a simple idea: the best software comes from solving real problems, not chasing feature lists.
+            </p>
+          </div>
         </div>
       </section>
 
-      <section className="relative py-24 md:py-32 px-6 bg-[#F5F3FF] dark:bg-[#F5F3FF]">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid lg:grid-cols-12 gap-16">
+      <section className="relative py-24 md:py-32 px-6 bg-card">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        </div>
+        
+        <div className="container mx-auto max-w-7xl relative z-10">
+          <div className="grid lg:grid-cols-12 gap-16 items-start">
             <div className="lg:col-span-5">
-              <span className="inline-block text-[#7C3AED] text-sm font-mono tracking-widest uppercase mb-4 opacity-0 animate-fade-up">
-                The Story
-              </span>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[#1E1B2E] leading-[1.1] opacity-0 animate-fade-up stagger-1">
-                From Costa Rica to the USA.
-              </h2>
-            </div>
-            <div className="lg:col-span-7">
-              <div className="space-y-6 opacity-0 animate-fade-up stagger-2">
-                <p className="text-xl text-[#4C4469] leading-relaxed">
+              <div className="sticky top-32">
+                <span className="eyebrow mb-6 block animate-fade-up">The Story</span>
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-8 animate-fade-up stagger-1">
+                  From Costa Rica
+                  <br />
+                  <span className="text-gradient">to the USA.</span>
+                </h2>
+                <p className="text-lg text-muted-foreground leading-relaxed animate-fade-up stagger-2">
                   MysteryD was originally founded in Costa Rica in the early 2000s. It&apos;s being revived and relaunched in the USA in 2026.
                 </p>
-                <p className="text-xl text-[#4C4469] leading-relaxed">
+              </div>
+            </div>
+            
+            <div className="lg:col-span-7 space-y-8">
+              <div className="bg-secondary/30 rounded-3xl p-10 border border-border animate-fade-up stagger-2">
+                <p className="text-lg text-muted-foreground leading-relaxed">
                   The mission hasn&apos;t changed: build the Shopify apps we wish existed. Simple, well-crafted tools that do exactly what they say — no bloat, no surprises.
                 </p>
-                <p className="text-xl text-[#4C4469] leading-relaxed">
+              </div>
+              <div className="bg-secondary/30 rounded-3xl p-10 border border-border animate-fade-up stagger-3">
+                <p className="text-lg text-muted-foreground leading-relaxed">
                   30+ years of software and product experience tells us one thing: merchants deserve better than the bloated, expensive, poorly-supported apps they&apos;re stuck with today.
+                </p>
+              </div>
+              <div className="bg-secondary/30 rounded-3xl p-10 border border-border animate-fade-up stagger-4">
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  We believe in transparency — open source code, public development, honest pricing. No black boxes.
                 </p>
               </div>
             </div>
@@ -68,15 +108,17 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="relative py-24 md:py-32 px-6 bg-[#1E1B2E] dark:bg-[#1E1B2E] text-[#EDE9FE]">
+      <section className="relative py-24 md:py-40 px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-foreground" />
         <div className="absolute inset-0 noise-overlay" />
-        <div className="container mx-auto max-w-6xl relative z-10">
-          <div className="text-center mb-16">
-            <span className="inline-block text-[#9D5FF3] text-sm font-mono tracking-widest uppercase mb-4 opacity-0 animate-fade-up">
-              The Team
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight opacity-0 animate-fade-up stagger-1">
-              Small team. Big experience.
+        
+        <div className="container mx-auto max-w-7xl relative z-10">
+          <div className="text-center mb-20">
+            <span className="eyebrow mb-6 block animate-fade-up">The Team</span>
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight animate-fade-up stagger-1">
+              Small team.
+              <br />
+              <span className="text-gradient">Big experience.</span>
             </h2>
           </div>
           
@@ -84,17 +126,20 @@ export default function AboutPage() {
             {team.map((member, index) => (
               <div
                 key={member.name}
-                className="relative p-8 bg-[#1A1033] rounded-2xl border border-[#3D2F6B] hover-lift opacity-0 animate-fade-up"
+                className="group relative bg-card rounded-3xl p-10 border border-border hover-lift animate-fade-up"
                 style={{ animationDelay: `${(index + 2) * 100}ms` }}
               >
-                <div className="w-16 h-16 rounded-full bg-[#9D5FF3]/20 flex items-center justify-center mb-6">
-                  <span className="text-2xl font-bold text-[#9D5FF3]">{member.initials}</span>
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-primary/50 rounded-t-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                
+                <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-8">
+                  <span className="text-3xl font-bold text-primary">{member.initials}</span>
                 </div>
-                <h3 className="text-xl font-bold text-[#EDE9FE] mb-1">
+                
+                <h3 className="text-2xl font-bold mb-2">
                   {member.name}
                 </h3>
-                <p className="text-sm text-[#9D5FF3] font-medium mb-4">{member.role}</p>
-                <p className="text-[#A89BC2] leading-relaxed">
+                <p className="text-sm text-primary font-medium mb-6">{member.role}</p>
+                <p className="text-muted-foreground leading-relaxed">
                   {member.bio}
                 </p>
               </div>
@@ -103,74 +148,68 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="relative py-24 md:py-32 px-6 bg-[#F5F3FF] dark:bg-[#F5F3FF]">
-        <div className="container mx-auto max-w-6xl">
+      <section className="relative py-24 md:py-32 px-6 bg-card">
+        <div className="container mx-auto max-w-7xl">
           <div className="text-center mb-16">
-            <span className="inline-block text-[#7C3AED] text-sm font-mono tracking-widest uppercase mb-4 opacity-0 animate-fade-up">
-              How We Work
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[#1E1B2E] opacity-0 animate-fade-up stagger-1">
+            <span className="eyebrow mb-6 block animate-fade-up">How We Work</span>
+            <h2 className="text-5xl md:text-6xl font-bold tracking-tight animate-fade-up stagger-1">
               Our principles.
             </h2>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="p-8 bg-white rounded-2xl border border-[#DDD6FE] opacity-0 animate-fade-up stagger-2">
-              <span className="text-4xl font-bold text-[#7C3AED]/20">01</span>
-              <h3 className="text-xl font-bold text-[#1E1B2E] mt-4 mb-3">
-                Async-first
-              </h3>
-              <p className="text-[#4C4469] leading-relaxed">
-                Small team. Ship fast, listen hard, improve constantly. No standups for the sake of standups.
-              </p>
-            </div>
-            <div className="p-8 bg-white rounded-2xl border border-[#DDD6FE] opacity-0 animate-fade-up stagger-3">
-              <span className="text-4xl font-bold text-[#7C3AED]/20">02</span>
-              <h3 className="text-xl font-bold text-[#1E1B2E] mt-4 mb-3">
-                Customer-led
-              </h3>
-              <p className="text-[#4C4469] leading-relaxed">
-                What merchants tell us matters more than what we assume. Real feedback, real improvements.
-              </p>
-            </div>
-            <div className="p-8 bg-white rounded-2xl border border-[#DDD6FE] opacity-0 animate-fade-up stagger-4">
-              <span className="text-4xl font-bold text-[#7C3AED]/20">03</span>
-              <h3 className="text-xl font-bold text-[#1E1B2E] mt-4 mb-3">
-                One at a time
-              </h3>
-              <p className="text-[#4C4469] leading-relaxed">
-                Scope locked before build begins. No feature creep. Every app does one thing well.
-              </p>
-            </div>
+            {principles.map((principle, index) => (
+              <div 
+                key={principle.number} 
+                className="p-10 bg-secondary/30 rounded-3xl border border-border hover-lift animate-fade-up"
+                style={{ animationDelay: `${(index + 2) * 100}ms` }}
+              >
+                <span className="text-6xl font-bold text-primary/20 mb-6 block">
+                  {principle.number}
+                </span>
+                <h3 className="text-2xl font-bold mb-4">
+                  {principle.title}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {principle.description}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="relative py-24 md:py-32 px-6 bg-gradient-to-br from-[#7C3AED] to-[#6D28D9] dark:from-[#9D5FF3] dark:to-[#7C3AED] text-white overflow-hidden">
+      <section className="relative py-24 md:py-40 px-6 bg-gradient-to-br from-primary via-primary to-primary/80 text-primary-foreground overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-black/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+          <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-black/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
         </div>
         
         <div className="container mx-auto max-w-4xl relative z-10 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6 opacity-0 animate-fade-up">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fade-up">
             Get involved.
           </h2>
-          <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto opacity-0 animate-fade-up stagger-1">
+          <p className="text-xl text-white/80 mb-14 max-w-2xl mx-auto animate-fade-up stagger-1">
             Follow the build, join the mailing list, or just watch what we&apos;re working on.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center opacity-0 animate-fade-up stagger-2">
+          <div className="flex flex-col sm:flex-row gap-5 justify-center animate-fade-up stagger-2">
             <a
               href="https://github.com/mysteryd"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-[#7C3AED] hover:bg-[#F5F3FF] font-semibold rounded-lg transition-all duration-300 hover:scale-105"
+              className="inline-flex items-center justify-center gap-3 px-10 py-5 bg-white text-primary hover:bg-secondary font-bold rounded-xl transition-all duration-300 hover:scale-105"
             >
-              <GithubIcon className="h-5 w-5" />
+              <GithubIcon className="h-6 w-6" />
               Follow on GitHub
             </a>
-            <MailingListForm />
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center gap-3 px-10 py-5 border-2 border-white/50 text-white hover:bg-white/10 font-semibold rounded-xl transition-all duration-300"
+            >
+              Back to Home
+              <ArrowRight className="h-5 w-5" />
+            </Link>
           </div>
         </div>
       </section>

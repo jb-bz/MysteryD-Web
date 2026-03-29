@@ -11,27 +11,38 @@ const navLinks = [
 export function Footer() {
   return (
     <footer className="border-t border-border bg-card">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid gap-8 md:grid-cols-3">
-          <div>
-            <Link href="/" className="flex items-center space-x-2">
-              <span className="text-xl font-bold tracking-tight font-heading text-primary">
+      <div className="container mx-auto px-6 py-16">
+        <div className="grid md:grid-cols-4 gap-12">
+          <div className="md:col-span-2">
+            <Link href="/" className="inline-block">
+              <span className="text-2xl font-bold tracking-tight font-heading text-primary">
                 MysteryD
               </span>
             </Link>
-            <p className="mt-4 text-sm text-muted-foreground">
+            <p className="mt-4 text-muted-foreground max-w-sm">
               No black boxes. Just better apps.
             </p>
+            <a
+              href="https://github.com/mysteryd"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 mt-6 text-muted-foreground hover:text-primary transition-colors"
+            >
+              <GithubIcon className="h-5 w-5" />
+              Follow on GitHub
+            </a>
           </div>
 
           <div>
-            <h3 className="mb-4 text-sm font-semibold">Navigation</h3>
-            <nav className="flex flex-col gap-2">
+            <h3 className="mb-6 text-sm font-mono tracking-widest uppercase text-foreground">
+              Navigation
+            </h3>
+            <nav className="flex flex-col gap-3">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                  className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -40,22 +51,18 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-4 text-sm font-semibold">Connect</h3>
-            <a
-              href="https://github.com/mysteryd"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
-            >
-              <GithubIcon className="h-4 w-4" />
-              Follow on GitHub
-            </a>
+            <h3 className="mb-6 text-sm font-mono tracking-widest uppercase text-foreground">
+              Company
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Built in public by Mysterious Development, LLC
+            </p>
           </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t border-border">
+        <div className="mt-16 pt-8 border-t border-border">
           <p className="text-sm text-muted-foreground text-center">
-            Built in public by Mysterious Development, LLC
+            &copy; {new Date().getFullYear()} Mysterious Development, LLC. All rights reserved.
           </p>
         </div>
       </div>
