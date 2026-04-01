@@ -1,4 +1,6 @@
 import * as React from "react"
+import Image from "next/image"
+import type { ImageProps } from "next/image"
 import { cn } from "@/lib/utils"
 
 function Avatar({
@@ -22,10 +24,12 @@ function Avatar({
   )
 }
 
-function AvatarImage({ className, ...props }: React.ComponentProps<"img">) {
+function AvatarImage({ className, alt = "", ...props }: ImageProps) {
   return (
-    <img
+    <Image
       data-slot="avatar-image"
+      alt={alt}
+      fill
       className={cn(
         "aspect-square size-full rounded-full object-cover",
         className

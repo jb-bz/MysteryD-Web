@@ -3,6 +3,8 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface NewsletterFormProps {
   variant?: "waitlist" | "newsletter";
@@ -113,7 +115,7 @@ function NewsletterForm({
           className={cn(
             "rounded-lg p-6",
             variant === "waitlist"
-              ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+              ? "bg-success/5 dark:bg-success/10 border border-success/30 dark:border-success/40"
               : "bg-primary/10 border border-primary/20"
           )}
         >
@@ -121,7 +123,7 @@ function NewsletterForm({
             className={cn(
               "font-heading text-lg font-medium mb-2",
               variant === "waitlist"
-                ? "text-green-800 dark:text-green-200"
+                ? "text-success dark:text-success"
                 : "text-primary"
             )}
           >
@@ -129,10 +131,8 @@ function NewsletterForm({
           </h3>
           <p
             className={cn(
-              "text-sm",
-              variant === "waitlist"
-                ? "text-green-700 dark:text-green-300"
-                : "text-muted-foreground"
+              "text-sm text-muted-foreground",
+              variant === "waitlist" && "text-success/80 dark:text-success/80"
             )}
           >
             {variant === "waitlist" ? (
@@ -161,17 +161,14 @@ function NewsletterForm({
     return (
       <form onSubmit={handleSubmit} className={cn("flex gap-2", className)}>
         <div className="relative flex-1">
-          <input
+          <Input
             type="email"
             placeholder="your@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={cn(
-              "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base",
-              "transition-colors outline-none placeholder:text-muted-foreground",
-              "focus:ring-2 focus:ring-ring focus:ring-offset-1",
-              "disabled:opacity-50 max-w-[240px]",
-              status === "error" && "border-red-500 focus:ring-red-500"
+              "h-8 max-w-[240px]",
+              status === "error" && "border-destructive focus:ring-destructive"
             )}
             required
             aria-label="Email address"
@@ -179,23 +176,19 @@ function NewsletterForm({
             aria-describedby={status === "error" ? "compact-form-error" : undefined}
           />
           {status === "error" && (
-            <span id="compact-form-error" role="alert" className="absolute -bottom-5 left-0 text-xs text-red-500">
+            <span id="compact-form-error" role="alert" className="absolute -bottom-5 left-0 text-xs text-destructive">
               Please enter a valid email
             </span>
           )}
         </div>
-        <button
+        <Button
           type="submit"
           disabled={loading}
-          className={cn(
-            "h-9 rounded-lg bg-primary px-3 py-1 text-sm font-medium",
-            "text-primary-foreground transition-all hover:bg-primary/80",
-            "disabled:opacity-50 inline-flex items-center gap-2"
-          )}
+          size="sm"
         >
           {loading ? <Spinner size="sm" /> : null}
           {loading ? "..." : "Subscribe"}
-        </button>
+        </Button>
       </form>
     );
   }
@@ -214,17 +207,14 @@ function NewsletterForm({
       )}
       <form onSubmit={handleSubmit} className="flex gap-2">
         <div className="relative flex-1">
-          <input
+          <Input
             type="email"
             placeholder="your@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={cn(
-              "h-10 flex-1 rounded-lg border border-input bg-transparent px-3 py-2 text-sm",
-              "transition-colors outline-none placeholder:text-muted-foreground",
-              "focus:ring-2 focus:ring-ring focus:ring-offset-1",
-              "disabled:opacity-50",
-              status === "error" && "border-red-500 focus:ring-red-500"
+              "h-10",
+              status === "error" && "border-destructive focus:ring-destructive"
             )}
             required
             aria-label="Email address"
@@ -232,23 +222,19 @@ function NewsletterForm({
             aria-describedby={status === "error" ? "form-error" : undefined}
           />
           {status === "error" && (
-            <span id="form-error" role="alert" className="absolute -bottom-5 left-0 text-xs text-red-500">
+            <span id="form-error" role="alert" className="absolute -bottom-5 left-0 text-xs text-destructive">
               Please enter a valid email
             </span>
           )}
         </div>
-        <button
+        <Button
           type="submit"
           disabled={loading}
-          className={cn(
-            "h-10 rounded-lg bg-primary px-4 py-2 text-sm font-medium",
-            "text-primary-foreground transition-all hover:bg-primary/80",
-            "disabled:opacity-50 inline-flex items-center gap-2"
-          )}
+          className={variant === "waitlist" ? undefined : "shrink-0"}
         >
           {loading ? <Spinner size="sm" /> : null}
           {loading ? "..." : variant === "waitlist" ? "Join" : "Subscribe"}
-        </button>
+        </Button>
       </form>
       {variant === "waitlist" && (
         <p className="text-xs text-muted-foreground text-center mt-3">
