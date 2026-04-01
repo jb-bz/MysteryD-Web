@@ -1,0 +1,61 @@
+:root {
+  --app-bg: #F5F3FF;
+  --app-surface: #FFFFFF;
+  --app-border: #DDD6FE;
+  --app-text-primary: #1E1B2E;
+  --app-text-secondary: #4C4469;
+  --app-accent: #7C3AED;
+  --app-accent-hover: #6D28D9;
+  --app-success: #10B981;
+  --app-warning: #F59E0B;
+  --app-error: #EF4444;
+  --app-muted: #C4B5FD;
+  --info: #3B82F6;
+  --info-foreground: #FFFFFF;
+  --success: #22C55E;
+  --success-foreground: #FFFFFF;
+  --warning: #F59E0B;
+  --warning-foreground: #1E1B2E;
+
+  --app-space-1: 4px;
+  --app-space-2: 8px;
+  --app-space-3: 12px;
+  --app-space-4: 16px;
+  --app-space-5: 20px;
+  --app-space-6: 24px;
+  --app-space-8: 32px;
+
+  --app-radius-sm: 6px;
+  --app-radius-md: 10px;
+  --app-radius-lg: 14px;
+
+  --app-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --app-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --app-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+
+  --app-sidebar-width: 240px;
+  --app-sidebar-collapsed-width: 64px;
+  --app-header-height: 56px;
+  --app-content-max-width: 1200px;
+  --app-form-max-width: 560px;
+}
+
+.dark {
+  --app-bg: #0F0A1E;
+  --app-surface: #1A1033;
+  --app-border: #3D2F6B;
+  --app-text-primary: #EDE9FE;
+  --app-text-secondary: #D8CDE0;
+  --app-accent: #9D5FF3;
+  --app-accent-hover: #7C3AED;
+  --app-success: #34D399;
+  --app-warning: #FBBF24;
+  --app-error: #F87171;
+  --app-muted: #3D2F6B;
+  --info: #60A5FA;
+  --info-foreground: #0F0A1E;
+  --success: #4ADE80;
+  --success-foreground: #0F0A1E;
+  --warning: #FBBF24;
+  --warning-foreground: #0F0A1E;
+}

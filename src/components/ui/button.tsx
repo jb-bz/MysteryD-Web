@@ -1,13 +1,16 @@
 import * as React from "react";
+import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
   size?: "default" | "sm" | "lg" | "icon";
   asChild?: boolean;
+  loading?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className = "", variant = "default", size = "default", ...props }, ref) => {
+  ({ className = "", variant = "default", size = "default", loading = false, disabled, children, ...props }, ref) => {
     const baseStyles = "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
     
     const variants = {
@@ -20,18 +23,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
     
     const sizes = {
-      default: "h-11 px-8 py-4",
-      sm: "h-9 rounded-lg px-3",
+      default: "h-11 px-8 py-4 rounded-lg",
+      sm: "h-9 px-3 rounded-md",
       lg: "h-12 rounded-xl px-10 py-6 text-base",
-      icon: "h-10 w-10",
+      icon: "h-10 w-10 rounded-lg",
     };
     
     return (
       <button
-        className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
+        className={cn(baseStyles, variants[variant], sizes[size], loading && "cursor-wait", className)}
         ref={ref}
+        disabled={disabled || loading}
         {...props}
-      />
+      >
+        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+        {children}
+      </button>
     );
   }
 );

@@ -8,6 +8,8 @@ function Separator({
   return (
     <div
       data-slot="separator"
+      role="separator"
+      aria-orientation="horizontal"
       className={cn(
         "shrink-0 bg-border h-px w-full",
         className
