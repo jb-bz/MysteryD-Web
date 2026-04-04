@@ -17,7 +17,6 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 }
 
 export { createQueryClient };
-export * from './shopify-auth';
 export * from './orders';
 export * from './customers';
 export * from './analytics';

@@ -9,17 +9,17 @@ describe('shopify-auth', () => {
   });
 
   describe('getSession', () => {
-    it('should return null when no session exists', () => {
+    it('should return null when no session exists', async () => {
       const stored = sessionStorage.getItem(SESSION_KEY);
       sessionStorage.removeItem(SESSION_KEY);
 
-      const result = shopifyAuth.getSession();
+      const result = await shopifyAuth.getSession();
       expect(result).toBeNull();
 
       if (stored) sessionStorage.setItem(SESSION_KEY, stored);
     });
 
-    it('should return session object when session exists', () => {
+    it('should return session object when session exists', async () => {
       const mockSession = {
         shop: 'test.myshopify.com',
         accessToken: 'test_token_123',
@@ -27,7 +27,7 @@ describe('shopify-auth', () => {
       };
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(mockSession));
 
-      const result = shopifyAuth.getSession();
+      const result = await shopifyAuth.getSession();
       expect(result).toEqual(mockSession);
 
       sessionStorage.removeItem(SESSION_KEY);
@@ -69,14 +69,14 @@ describe('shopify-auth', () => {
   });
 
   describe('isAuthenticated', () => {
-    it('should return false when no session exists', () => {
+    it('should return false when no session exists', async () => {
       sessionStorage.removeItem(SESSION_KEY);
 
-      const result = shopifyAuth.isAuthenticated();
+      const result = await shopifyAuth.isAuthenticated();
       expect(result).toBe(false);
     });
 
-    it('should return true when session exists', () => {
+    it('should return true when session exists', async () => {
       const mockSession = {
         shop: 'test.myshopify.com',
         accessToken: 'test_token_123',
@@ -84,7 +84,7 @@ describe('shopify-auth', () => {
       };
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(mockSession));
 
-      const result = shopifyAuth.isAuthenticated();
+      const result = await shopifyAuth.isAuthenticated();
       expect(result).toBe(true);
 
       sessionStorage.removeItem(SESSION_KEY);

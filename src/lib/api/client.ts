@@ -1,5 +1,3 @@
-import { getSession } from './shopify-auth';
-
 const API_VERSION = '2024-01';
 
 export class ShopifyApiError extends Error {
@@ -19,6 +17,7 @@ interface ShopifyErrorResponse {
 }
 
 async function shopifyFetch<T>(path: string): Promise<T> {
+  const { getSession } = await import('./shopify-auth');
   const session = await getSession();
   if (!session) {
     throw new ShopifyApiError('Not authenticated', 401, 'AUTH_REQUIRED');
